@@ -17,10 +17,10 @@ log = logging.getLogger('oots-downloader')
 
 # Regex for image url (suddenly they decided to use an hash of the filename
 # instead of the name with the progressive id).
-_img_url_regex = re.compile(r'<IMG src="(/comics/images/.*\.gif)">')
+_img_url_regex = re.compile(r'<IMG src="(/comics/images/.*\.(?:gif|png))">')
 
 # Latest comic downloaded regexp.
-_img_filename = re.compile(r'oots(\d{4})\.gif')
+_img_filename = re.compile(r'oots(\d{4})\.(?:gif|png)')
 
 def open_page(url):
     """
@@ -74,7 +74,7 @@ def get_image(n):
     log.info('Downloading "%s"', img_url)
     img = open_page(img_url)
     log.info('Download finished')
-    return img
+    return img, os.path.splitext(img_url)[1]
 
 def save_image(img, filename):
     """
@@ -88,7 +88,8 @@ def save_image(img, filename):
 def main():
     last_downloaded, last = get_range()
     for i in range(last_downloaded + 1, last + 1):
-        save_image(get_image(i), 'oots%04d.gif' %i)
+        img, ext = get_image(i)
+        save_image(img, 'oots%04d%s' %(i, ext))
 
 if __name__ == '__main__':
     main()
